@@ -15,12 +15,14 @@ Effortlessly create, manage, and track employee schedules with our intuitive Shi
 ```
 Shift-Management-App/
 ├── backend/         # Node.js/Express API
-│   ├── api/        # API endpoints
-│   └── __tests__/  # Backend tests (Jest)
+│   ├── routes/      # API endpoints
+│   ├── services/    # Business logic and data access
+│   ├── __tests__/   # Backend tests (Jest)
+│   └── __mocks__/   # Mock data/services for testing
 ├── frontend/        # Vue 3 app
-│   ├── src/        # Vue components, views, stores
-│   ├── e2e/        # End-to-end tests (Playwright)
-│   └── public/     # Static assets
+│   ├── src/         # Vue components, views, stores, assets
+│   ├── e2e/         # End-to-end tests (Playwright)
+│   └── public/      # Static assets
 └── README.md
 ```
 
@@ -40,19 +42,19 @@ cd ../frontend && npm install
 ### Run the App
 ```sh
 # Start backend API
-npm start:backend
+npm run start:backend
 # In a new terminal, start frontend
-npm start:frontend
+npm run start:frontend
 ```
 
 ### Run Tests
 ```sh
 # Backend tests
-npm test:backend
+npm run test:backend
 # Frontend unit tests
-npm test:frontend-unit
+npm run test:frontend-unit
 # Frontend e2e tests
-npm test:frontend-e2e
+npm run test:frontend-e2e
 ```
 
 ## Technologies Used
