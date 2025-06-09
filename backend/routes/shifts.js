@@ -20,8 +20,8 @@ async function validateShift(workerId, start, end, idToExclude = null) {
     // Query all shifts for the worker
     const query = datastore
       .createQuery(SHIFT_KIND)
-      .filter('workerId', '==', workerId)
-      .orderBy('start');
+      .filter('workerId', '=', workerId)
+      .order('start');
     const [shifts] = await datastore.runQuery(query);
 
     // Check for overlapping shifts
