@@ -1,0 +1,15 @@
+{
+  "name": "shift-management-app",
+  "version": "1.0.0",
+  "description": "Effortlessly create, manage, and track employee schedules with our intuitive Shift Management App. Simplify workforce coordination by building balanced schedules in minutes, while empowering employees to easily swap shifts and manage their availability. Streamline communication, reduce admin work, and boost team productivity and flexibility.",
+  "scripts": {
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm run dev",
+    "test:backend": "cd backend && npm test",
+    "test:frontend-unit": "cd frontend && npm run test:unit",
+    "test:frontend-e2e": "cd frontend && npm run test:e2e"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
