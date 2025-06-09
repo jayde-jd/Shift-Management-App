@@ -13,32 +13,36 @@ function calculateDuration(startISO, endISO) {
 
 // Validates a shift for duration and overlap with existing shifts
 async function validateShift(workerId, start, end, idToExclude = null) {
-  const duration = calculateDuration(start, end);
-  if (duration > 12) throw new Error('Shift exceeds 12 hours');
+  try {
+    const duration = calculateDuration(start, end);
+    if (duration > 12) throw new Error('Shift exceeds 12 hours');
 
-  // Query all shifts for the worker
-  const query = datastore
-    .createQuery(SHIFT_KIND)
-    .filter('workerId', '=', workerId);
-  const [shifts] = await datastore.runQuery(query);
+    // Query all shifts for the worker
+    const query = datastore
+      .createQuery(SHIFT_KIND)
+      .filter('workerId', '=', workerId);
+    const [shifts] = await datastore.runQuery(query);
 
-  // Check for overlapping shifts
-  for (const shift of shifts) {
-    if (idToExclude && shift[datastore.KEY].id === idToExclude) continue;
+    // Check for overlapping shifts
+    for (const shift of shifts) {
+      if (idToExclude && shift[datastore.KEY].id === idToExclude) continue;
 
-    if (
-      !(DateTime.fromISO(end) <= DateTime.fromISO(shift.start) ||
-        DateTime.fromISO(start) >= DateTime.fromISO(shift.end))
-    ) {
-      throw new Error('Shift overlaps with an existing one');
+      if (
+        !(DateTime.fromISO(end) <= DateTime.fromISO(shift.start) ||
+          DateTime.fromISO(start) >= DateTime.fromISO(shift.end))
+      ) {
+        throw new Error('Shift overlaps with an existing one');
+      }
     }
+  } catch (err) {
+    throw err;
   }
 }
 
 // Create a new shift
 router.post('/', async (req, res) => {
-  const { workerId, start, end } = req.body;
   try {
+    const { workerId, start, end } = req.body;
     // Get timezone and convert start/end to that zone
     const tz = await getTimezone();
     const startTz = DateTime.fromISO(start, { zone: tz });
@@ -68,8 +72,12 @@ router.post('/', async (req, res) => {
 
 // Get all shifts
 router.get('/', async (req, res) => {
-  const [shifts] = await datastore.runQuery(datastore.createQuery(SHIFT_KIND));
-  res.json(shifts);
+  try {
+    const [shifts] = await datastore.runQuery(datastore.createQuery(SHIFT_KIND));
+    res.json(shifts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;

@@ -4,8 +4,12 @@ const { getTimezone, setTimezone } = require('../services/timezone');
 
 // GET endpoint to retrieve the current timezone setting
 router.get('/', async (req, res) => {
-  const tz = await getTimezone();
-  res.json({ timezone: tz });
+  try {
+    const tz = await getTimezone();
+    res.json({ timezone: tz });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to retrieve timezone' });
+  }
 });
 
 // POST endpoint to update the timezone setting
@@ -14,7 +18,7 @@ router.post('/', async (req, res) => {
   try {
     await setTimezone(timezone);
     res.json({ success: true });
-  } catch {
+  } catch (error) {
     // Return error if the timezone is invalid or setting fails
     res.status(400).json({ error: 'Invalid timezone' });
   }
