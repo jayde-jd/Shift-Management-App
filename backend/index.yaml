@@ -1,0 +1,4 @@
+indexes:
+- kind: Shift
+  properties:
+    - name: workerId
