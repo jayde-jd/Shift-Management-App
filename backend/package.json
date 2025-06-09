@@ -4,21 +4,20 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node api/index.js",
+    "start": "node index.js",
     "test": "jest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@google-cloud/datastore": "^10.0.1",
-    "body-parser": "^2.2.0",
-    "dotenv": "^16.5.0",
-    "express": "^5.1.0",
-    "luxon": "^3.6.1"
-  },
   "devDependencies": {
     "jest": "^29.7.0",
     "supertest": "^7.1.1"
+  },
+  "dependencies": {
+    "@google-cloud/datastore": "^10.0.1",
+    "body-parser": "^2.2.0",
+    "express": "^5.1.0",
+    "luxon": "^3.6.1"
   }
 }
