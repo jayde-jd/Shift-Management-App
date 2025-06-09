@@ -2,10 +2,12 @@
 const express = require('express');
 // Import body-parser to parse incoming JSON requests
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 // Create an instance of the Express application
 const app = express();
 
+app.use(cors()); 
 // Use body-parser middleware to parse JSON request bodies
 app.use(bodyParser.json());
 
