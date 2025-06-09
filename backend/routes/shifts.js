@@ -20,9 +20,13 @@ async function validateShift(workerId, start, end, idToExclude = null) {
     // Query all shifts for the worker
     const query = datastore
       .createQuery(SHIFT_KIND)
-      .filter('workerId', '=', workerId)
-      .order('start');
+      .filter('workerId', '=', workerId);
     const [shifts] = await datastore.runQuery(query);
+
+    if (shifts.length === 0) {
+      // No existing shifts, validation passes
+      return;
+    }
 
     // Check for overlapping shifts
     for (const shift of shifts) {
@@ -76,6 +80,45 @@ router.get('/', async (req, res) => {
   try {
     const [shifts] = await datastore.runQuery(datastore.createQuery(SHIFT_KIND));
     res.json(shifts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Update timezone and convert all existing shifts
+router.put('/timezone', async (req, res) => {
+  try {
+    const { newTimezone } = req.body;
+    if (!newTimezone) return res.status(400).json({ error: 'newTimezone is required' });
+
+    // Get all shifts
+    const [shifts] = await datastore.runQuery(datastore.createQuery(SHIFT_KIND));
+    const updates = [];
+
+    for (const shift of shifts) {
+      const key = shift[datastore.KEY];
+      // Convert start/end to new timezone, keeping the same UTC instant
+      const startUtc = DateTime.fromISO(shift.start).toUTC();
+      const endUtc = DateTime.fromISO(shift.end).toUTC();
+      const startTz = startUtc.setZone(newTimezone).toISO();
+      const endTz = endUtc.setZone(newTimezone).toISO();
+      updates.push({
+        key,
+        data: {
+          ...shift,
+          start: startTz,
+          end: endTz,
+        },
+      });
+    }
+    // Batch update all shifts
+    if (updates.length > 0) await datastore.save(updates);
+
+    // Optionally, update the timezone in your timezone service (if needed)
+    if (typeof datastore.setTimezone === 'function') {
+      await datastore.setTimezone(newTimezone);
+    }
+    res.json({ updated: updates.length });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
