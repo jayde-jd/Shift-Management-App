@@ -14,10 +14,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { getTimezone, setTimezone } from '@/api';
+import { getTimezone, updateTimezoneShifts } from '@/api';
 import { ElNotification } from 'element-plus';
+import { defineEmits } from 'vue';
 
 const timezone = ref('');
+const emit = defineEmits(['timezone-updated']);
 
 onMounted(async () => {
   const data = await getTimezone();
@@ -26,10 +28,15 @@ onMounted(async () => {
 
 const updateTimezone = async () => {
   try {
-    await setTimezone(timezone.value);
-    ElNotification.success({ title: 'Success', message: 'Timezone updated' });
+    const result = await updateTimezoneShifts(timezone.value);
+    if (result && result.success) {
+      ElNotification.success({ title: 'Success', message: 'Timezone and shifts updated' });
+      emit('timezone-updated');
+    } else if (result && result.error) {
+      ElNotification.error({ title: 'Error', message: result.error });
+    }
   } catch {
-    ElNotification.error({ title: 'Error', message: 'Failed to update timezone' });
+    ElNotification.error({ title: 'Error', message: 'Failed to update timezone and shifts' });
   }
 };
 </script>
