@@ -166,6 +166,26 @@ const loadData = async () => {
       store.loadWorkers(),
       store.loadTimezone(),
     ]);
+    // Sort shifts by start, then end, and group by workerId
+    const grouped = {};
+    shifts.value
+      .sort((a, b) => {
+        if (a.workerId !== b.workerId) {
+          return a.workerId.localeCompare(b.workerId);
+        }
+        if (a.start !== b.start) {
+          return a.start.localeCompare(b.start);
+        }
+        return a.end.localeCompare(b.end);
+      })
+      .forEach(shift => {
+        if (!grouped[shift.workerId]) grouped[shift.workerId] = [];
+        grouped[shift.workerId].push(shift);
+      });
+    // Flatten grouped shifts back to array for display
+    shifts.value = Object.values(grouped).flat();
+
+    workers.value = [...workers.value].sort((a, b) => a.name.localeCompare(b.name));
   } catch {
     ElNotification.error({ title: 'Error', message: 'Failed to load data' });
   } finally {

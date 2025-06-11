@@ -93,7 +93,10 @@ const newWorker = ref('');
 const editingWorker = ref(null);
 const editName = ref('');
 
-const loadWorkers = () => store.loadWorkers();
+const loadWorkers = async () => {
+  await store.loadWorkers();
+  workers.value.sort((a, b) => a.name.localeCompare(b.name));
+};
 onMounted(loadWorkers);
 
 const addWorker = async () => {
