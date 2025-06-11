@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
+// @ts-ignore
 import * as api from '@/api';
+// @ts-ignore
 import { useAppStore } from '@/stores';
 
 vi.mock('@/api');

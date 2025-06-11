@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
+// @ts-ignore
 import ShiftManager from '../ShiftManager.vue';
 import { createTestingPinia } from '@pinia/testing';
 

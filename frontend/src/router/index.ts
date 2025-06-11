@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+// @ts-ignore
 import AppVue from '@/App.vue'
 
 const router = createRouter({

@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
+// @ts-ignore
 import WorkerManager from '../WorkerManager.vue';
 import { createTestingPinia } from '@pinia/testing';
 
