@@ -4,6 +4,7 @@
       <span>Preferred Timezone</span>
     </template>
     <el-input
+      id="timezone-input"
       v-model="timezone"
       placeholder="Enter IANA timezone (e.g. America/New_York)"
       @blur="updateTimezone"

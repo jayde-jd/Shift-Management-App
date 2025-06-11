@@ -36,7 +36,7 @@ Shift-Management-App/
 # Install backend dependencies
 cd backend && npm install
 # Install frontend dependencies
-cd ../frontend && npm install
+cd frontend && npm install
 ```
 
 ### Run the App

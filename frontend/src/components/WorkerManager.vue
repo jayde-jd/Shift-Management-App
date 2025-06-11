@@ -2,6 +2,7 @@
   <el-card>
     <div class="worker-manager-add-row">
       <el-input
+        id="new-worker-input"
         v-model="newWorker"
         placeholder="Add new worker"
         @keyup.enter="addWorker"
@@ -10,6 +11,7 @@
         :disabled="isLoading"
       />
       <el-button type="primary"
+        id="add-worker-button"
         @click="addWorker"
         :loading="isLoading"
         :disabled="isLoading">
@@ -17,6 +19,7 @@
       </el-button>
     </div>
     <el-table :data="workers"
+      id="worker-table"
       class="worker-manager-table"
       :loading="isLoading">
       <el-table-column prop="name" label="Name" />
