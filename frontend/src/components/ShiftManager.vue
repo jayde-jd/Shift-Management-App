@@ -138,14 +138,19 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { getShifts, createShift, getWorkers, getTimezone, updateShift, deleteShift } from '@/api';
+import { storeToRefs } from 'pinia';
+import { useAppStore } from '@/stores';
 import { DateTime } from 'luxon';
 import { ElNotification, ElLoading } from 'element-plus';
 import WorkerManager from './WorkerManager.vue';
 
-const shifts = ref([]);
-const workers = ref([]);
-const timezone = ref('');
+const store = useAppStore();
+const {
+  shifts,
+  workers,
+  timezone,
+} = storeToRefs(store);
+
 const form = ref({ workerId: '', start: '', end: '' });
 const dialogVisible = ref(false);
 const editingShift = ref(null);
@@ -154,18 +159,11 @@ const editForm = ref({ workerId: '', start: '', end: '' });
 const loadData = async () => {
   const loading = ElLoading.service({ fullscreen: true });
   try {
-    const [shiftsData, workersData, tz] = await Promise.all([
-      getShifts(),
-      getWorkers(),
-      getTimezone().then(d => d.timezone),
+    await Promise.all([
+      store.loadShifts(),
+      store.loadWorkers(),
+      store.loadTimezone(),
     ]);
-    shifts.value = shiftsData.sort((a, b) => {
-      if (a.workerId !== b.workerId) return a.workerId.localeCompare(b.workerId);
-      if (a.start !== b.start) return new Date(a.start) - new Date(b.start);
-      return new Date(a.end) - new Date(b.end);
-    });
-    workers.value = workersData;
-    timezone.value = tz;
   } catch {
     ElNotification.error({ title: 'Error', message: 'Failed to load data' });
   } finally {
@@ -186,18 +184,12 @@ const create = async () => {
     ElNotification.warning({ title: 'Warning', message: 'All fields are required' });
     return;
   }
-
   const loading = ElLoading.service({ fullscreen: true });
   try {
-    const response = await createShift(form.value);
-
-    if (response?.id) {
-      ElNotification.success({ title: 'Success', message: 'Shift created successfully' });
-    } else if (response?.errors?.length) {
-      ElNotification.error({ title: 'Error', message: response.errors[0].message });
-    }
-    form.value = { workerId: '', start: '', end: '' }; // Reset form
-    await loadData(); // Reload shifts
+    await store.addShift(form.value);
+    ElNotification.success({ title: 'Success', message: 'Shift created successfully' });
+    form.value = { workerId: '', start: '', end: '' };
+    await loadData();
   } catch (e) {
     ElNotification.error({ title: 'Error', message: e.message || 'Failed to create shift' });
   } finally {
@@ -217,14 +209,10 @@ const saveEdit = async () => {
   }
   const loading = ElLoading.service({ fullscreen: true });
   try {
-    const response = await updateShift(editingShift.value.id, editForm.value);
-    if (response?.success) {
-      ElNotification.success({ title: 'Success', message: 'Shift updated successfully' });
-      editingShift.value = null;
-      await loadData();
-    } else if (response?.errors?.length) {
-      ElNotification.error({ title: 'Error', message: response.errors[0].message });
-    }
+    await store.updateShift({ id: editingShift.value.id, shift: editForm.value });
+    ElNotification.success({ title: 'Success', message: 'Shift updated successfully' });
+    editingShift.value = null;
+    await loadData();
   } catch (e) {
     ElNotification.error({ title: 'Error', message: e.message || 'Failed to update shift' });
   } finally {
@@ -239,7 +227,7 @@ const cancelEdit = () => {
 const handleDelete = async (row) => {
   const loading = ElLoading.service({ fullscreen: true });
   try {
-    await deleteShift(row.id);
+    await store.deleteShift(row.id);
     ElNotification.success({ title: 'Success', message: 'Shift deleted successfully' });
     await loadData();
   } catch (e) {

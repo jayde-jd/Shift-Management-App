@@ -13,22 +13,23 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { getTimezone, updateTimezoneShifts } from '@/api';
+import { onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useAppStore } from '@/stores';
 import { ElNotification } from 'element-plus';
-import { defineEmits } from 'vue';
 
-const timezone = ref('');
+const { timezone } = storeToRefs(useAppStore());
+
+const store = useAppStore();
 const emit = defineEmits(['timezone-updated']);
 
-onMounted(async () => {
-  const data = await getTimezone();
-  timezone.value = data.timezone;
+onMounted(() => {
+  store.loadTimezone();
 });
 
 const updateTimezone = async () => {
   try {
-    const result = await updateTimezoneShifts(timezone.value);
+    const result = await store.updateTimezone(timezone.value);
     if (result && result.success) {
       ElNotification.success({ title: 'Success', message: 'Timezone and shifts updated' });
       emit('timezone-updated');

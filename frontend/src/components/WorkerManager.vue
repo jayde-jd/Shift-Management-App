@@ -77,41 +77,26 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { getWorkers, createWorker, updateWorker, deleteWorker } from '@/api';
-import { ElNotification } from 'element-plus';
+import { storeToRefs } from 'pinia';
+import { useAppStore } from '@/stores';
 
-const workers = ref([]);
+const store = useAppStore();
+const {
+  workers,
+  isLoading
+} = storeToRefs(store);
+
 const newWorker = ref('');
-const isLoading = ref(false);
 const editingWorker = ref(null);
 const editName = ref('');
 
-const loadWorkers = async () => {
-  isLoading.value = true;
-  try {
-    workers.value = await getWorkers();
-  } catch (e) {
-    ElNotification.error({ title: 'Error', message: 'Failed to load workers.' });
-  } finally {
-    isLoading.value = false;
-  }
-};
-
+const loadWorkers = () => store.loadWorkers();
 onMounted(loadWorkers);
 
 const addWorker = async () => {
   if (!newWorker.value.trim()) return;
-  isLoading.value = true;
-  try {
-    await createWorker(newWorker.value);
-    newWorker.value = '';
-    await loadWorkers();
-    ElNotification.success({ title: 'Success', message: 'Worker added' });
-  } catch (e) {
-    ElNotification.error({ title: 'Error', message: 'Failed to add worker' });
-  } finally {
-    isLoading.value = false;
-  }
+  await store.addWorker(newWorker.value);
+  newWorker.value = '';
 };
 
 const handleEdit = (row) => {
@@ -121,18 +106,9 @@ const handleEdit = (row) => {
 
 const saveEdit = async () => {
   if (!editName.value.trim()) return;
-  isLoading.value = true;
-  try {
-    await updateWorker(editingWorker.value.id, editName.value);
-    editingWorker.value = null;
-    editName.value = '';
-    await loadWorkers();
-    ElNotification.success({ title: 'Success', message: 'Worker updated' });
-  } catch (e) {
-    ElNotification.error({ title: 'Error', message: 'Failed to update worker' });
-  } finally {
-    isLoading.value = false;
-  }
+  await store.updateWorker({ id: editingWorker.value.id, name: editName.value });
+  editingWorker.value = null;
+  editName.value = '';
 };
 
 const cancelEdit = () => {
@@ -141,16 +117,7 @@ const cancelEdit = () => {
 };
 
 const handleDelete = async (row) => {
-  isLoading.value = true;
-  try {
-    await deleteWorker(row.id);
-    await loadWorkers();
-    ElNotification.success({ title: 'Success', message: 'Worker deleted' });
-  } catch (e) {
-    ElNotification.error({ title: 'Error', message: 'Failed to delete worker' });
-  } finally {
-    isLoading.value = false;
-  }
+  await store.deleteWorker(row.id);
 };
 </script>
 
