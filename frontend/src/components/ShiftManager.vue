@@ -54,7 +54,9 @@
       </el-form-item>
     </el-form>
 
-    <el-table :data="shifts" class="mt-4" style="width: 100%">
+    <el-table :data="shifts"
+      class="mt-4"
+      style="width: 100%; max-height: 500px; overflow: auto">
       <el-table-column
         label="Worker"
         :formatter="getWorkerName" />
